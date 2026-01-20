@@ -21,3 +21,9 @@ Colab Pro.edu Tier:
   TPU v2-8 -> 1.76 CU/hour
 
   
+https://archive.ics.uci.edu/datasets
+https://fred.stlouisfed.org/
+https://datahub.io/collections
+https://www.earthdata.nasa.gov/data
+https://github.com/awesomedata/awesome-public-datasets
+https://datasetsearch.research.google.com/
