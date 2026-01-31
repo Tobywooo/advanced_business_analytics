@@ -27,3 +27,8 @@ https://datahub.io/collections
 https://www.earthdata.nasa.gov/data
 https://github.com/awesomedata/awesome-public-datasets
 https://datasetsearch.research.google.com/
+
+https://nasa-power.s3.us-west-2.amazonaws.com/index.html
+https://power.larc.nasa.gov/dashboard/
+
+
