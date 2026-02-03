@@ -205,3 +205,59 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+# Build output
+**/bin/
+**/obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+*.code-workspace
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+**/packages/
+*.snupkg
+
+# Test results / coverage
+TestResults/
+coverage/
+coverage.*
+*.trx
+
+# Publish output (if you create local publish folders)
+**/publish/
+**/artifacts/
+
+# Environment / secrets
+.env
+.env.*
+!*.env.example
+secrets.json
+appsettings.*.json
+!appsettings.json
+
+# Docker local overrides
+docker-compose.override.yml
+
+# Node (if you add JS tooling later)
+node_modules/
+dist/
+DataShowcase/DataShowcase.Web/appsettings.json
