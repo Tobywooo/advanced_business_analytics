@@ -1,7 +1,118 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Introduction</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="hero rounded-4 p-4 p-md-5 mb-4 text-white overflow-hidden">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-8">
+            <div class="eyebrow mb-2">DSBA 6211 • Group 1</div>
+            <h1 class="display-5 fw-semibold mb-3">Advanced Business Analytics Showcase</h1>
+            <p class="lead mb-4">
+                A single place to explore our datasets, model outputs, and interactive dashboards.
+                Use the cards below to jump into demos as we build out the full experience.
+            </p>
 
-Welcome to your new app.
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-light btn-lg" href="Data">Explore data</a>
+                <a class="btn btn-outline-light btn-lg" href="about">Project overview</a>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card stat-card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="small text-uppercase opacity-75">Quick stats</div>
+
+                    <div class="d-flex justify-content-between align-items-baseline mt-3">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value">In progress</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-baseline mt-2">
+                        <div class="stat-label">Modules</div>
+                        <div class="stat-value mono">3</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-baseline mt-2">
+                        <div class="stat-label">Last build</div>
+                        <div class="stat-value mono">@DateTime.Now.ToString("MMM d, yyyy")</div>
+                    </div>
+
+                    <hr class="opacity-25" />
+
+                    <div class="small opacity-75">
+                        Tip: Keep the landing page lightweight—dashboards can load on-demand from their own routes.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <a class="card h-100 feature-card" href="weather">
+            <div class="card-body">
+                <div class="icon-badge mb-3" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19V5" />
+                        <path d="M4 19h16" />
+                        <path d="M7 15l3-3 3 2 5-6" />
+                    </svg>
+                </div>
+                <h2 class="h5 mb-2">Data Explorer</h2>
+                <p class="text-muted mb-0">
+                    Browse and preview datasets (placeholder route: Weather demo).
+                </p>
+            </div>
+        </a>
+    </div>    
+
+    <div class="col-md-6">
+        <a class="card h-100 feature-card disabled-card" href="javascript:void(0)">
+            <div class="card-body">
+                <div class="icon-badge mb-3" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 7h16" />
+                        <path d="M4 12h10" />
+                        <path d="M4 17h16" />
+                    </svg>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="h5 mb-2">Dashboards</h2>
+                    <span class="badge text-bg-secondary">Coming soon</span>
+                </div>
+                <p class="text-muted mb-0">
+                    Model performance, forecasts, and scenario views.
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<hr class="my-4" />
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <h2 class="h4 mb-3">What this site will include</h2>
+        <ul class="list-unstyled checklist">
+            <li class="mb-2">Dataset catalog with filters (source, geography, frequency)</li>
+            <li class="mb-2">Model runs, metrics, and diagnostics</li>
+            <li class="mb-2">Forecast dashboards and exportable charts</li>
+            <li class="mb-2">Narrative “story” pages explaining results</li>
+        </ul>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="small text-uppercase text-muted">Next steps</div>
+                <h3 class="h5 mt-2">Add your first real module</h3>
+                <p class="text-muted mb-3">
+                    Create a new page (e.g. <span class="mono">/retail-sales</span>) and link it from the sidebar + cards.
+                </p>
+                <a class="btn btn-outline-primary" href="about">See project overview</a>
+            </div>
+        </div>
+    </div>
+</div>

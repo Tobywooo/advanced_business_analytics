@@ -1,0 +1,567 @@
+@page "/data"
+@inject IWebHostEnvironment Env
+
+<PageTitle>Data Explorer</PageTitle>
+
+<h1 class="mb-3">Data Explorer</h1>
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+else if (!_loaded)
+{
+    <div class="text-muted">Loading dataset…</div>
+}
+else
+{
+    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-2">
+        <div class="text-muted">
+            File: <span class="font-monospace">@CsvWebPath</span> •
+            Total rows: @_allRows.Count •
+            Filtered: @_filteredRows.Count
+        </div>
+
+        <button class="btn btn-outline-secondary btn-sm" @onclick="ClearFilters">
+            Clear filters
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Period range -->
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label class="form-label">Period (from)</label>
+                    <input class="form-control" placeholder="YYYY-MM"
+                           @bind="Filters.PeriodFrom" @bind:event="oninput"
+                           @bind:after="OnFilterChanged" />
+                </div>
+
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label class="form-label">Period (to)</label>
+                    <input class="form-control" placeholder="YYYY-MM"
+                           @bind="Filters.PeriodTo" @bind:event="oninput"
+                           @bind:after="OnFilterChanged" />
+                </div>
+
+                <!-- State filters -->
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label class="form-label">State ID</label>
+                    <select class="form-select"
+                            @bind="Filters.StateId"
+                            @bind:after="OnFilterChanged">
+                        <option value="">All</option>
+                        @foreach (var v in _stateIds)
+                        {
+                            <option value="@v">@v</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label class="form-label">State</label>
+                    <select class="form-select"
+                            @bind="Filters.StateDescription"
+                            @bind:after="OnFilterChanged">
+                        <option value="">All</option>
+                        @foreach (var v in _stateDescriptions)
+                        {
+                            <option value="@v">@v</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Sales unit -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label class="form-label">Sales unit</label>
+                    <select class="form-select"
+                            @bind="Filters.SalesUnit"
+                            @bind:after="OnFilterChanged">
+                        <option value="">All</option>
+                        @foreach (var v in _salesUnits)
+                        {
+                            <option value="@v">@v</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Numeric min/max filters -->
+                @NumericFilter("ALL", "All sectors", nameof(Row.All))
+                @NumericFilter("COM", "Commercial", nameof(Row.Com))
+                @NumericFilter("IND", "Industrial", nameof(Row.Ind))
+                @NumericFilter("OTH", "Other", nameof(Row.Oth))
+                @NumericFilter("RES", "Residential", nameof(Row.Res))
+                @NumericFilter("TRA", "Transportation", nameof(Row.Tra))
+            </div>
+        </div>
+    </div>
+
+    <!-- Paging controls -->
+    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-2">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="text-muted">Rows per page</span>
+            <select class="form-select form-select-sm" style="width: auto"
+                    @bind="PageSize"
+                    @bind:after="OnPageSizeChanged">
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="250">250</option>
+                <option value="500">500</option>
+            </select>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <button type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    @onclick="PrevPage"
+                    disabled="@(CurrentPage <= 1)">
+                Prev
+            </button>
+
+            <span class="text-muted">
+                Page <span class="font-monospace">@CurrentPage</span> of
+                <span class="font-monospace">@TotalPages</span>
+            </span>
+
+            <button type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    @onclick="NextPage"
+                    disabled="@(CurrentPage >= TotalPages)">
+                Next
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>period</th>
+                    <th>stateid</th>
+                    <th>stateDescription</th>
+                    <th class="text-end">ALL</th>
+                    <th class="text-end">COM</th>
+                    <th class="text-end">IND</th>
+                    <th class="text-end">OTH</th>
+                    <th class="text-end">RES</th>
+                    <th class="text-end">TRA</th>
+                    <th>salesUnit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in PagedRows)
+                {
+                    <tr>
+                        <td class="font-monospace">@r.Period</td>
+                        <td class="font-monospace">@r.StateId</td>
+                        <td>@r.StateDescription</td>
+
+                        <td class="text-end font-monospace">@Fmt(r.All)</td>
+                        <td class="text-end font-monospace">@Fmt(r.Com)</td>
+                        <td class="text-end font-monospace">@Fmt(r.Ind)</td>
+                        <td class="text-end font-monospace">@Fmt(r.Oth)</td>
+                        <td class="text-end font-monospace">@Fmt(r.Res)</td>
+                        <td class="text-end font-monospace">@Fmt(r.Tra)</td>
+
+                        <td>@r.SalesUnit</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private const string CsvWebPath = "/data/eia_retail_sales_mwh_monthly_state_sectorwide.csv";
+
+    private string? Error;
+    private bool _loaded;
+
+    // Full dataset + filtered dataset
+    private readonly List<Row> _allRows = new();
+    private List<Row> _filteredRows = new();
+
+    // Dropdown values
+    private List<string> _stateIds = new();
+    private List<string> _stateDescriptions = new();
+    private List<string> _salesUnits = new();
+
+    // Filters + paging
+    private FilterState Filters = new();
+    private int PageSize = 50;
+    private int CurrentPage = 1;
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(_filteredRows.Count / (double)PageSize));
+
+    private IEnumerable<Row> PagedRows =>
+        _filteredRows
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize);
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            var relative = CsvWebPath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+            var csvDiskPath = Path.Combine(Env.WebRootPath, relative);
+
+            if (!System.IO.File.Exists(csvDiskPath))
+            {
+                Error = $"CSV not found. Expected at: {csvDiskPath}";
+                return;
+            }
+
+            LoadCsv(csvDiskPath);
+
+            // Build dropdown values
+            _stateIds = _allRows.Select(r => r.StateId)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct().OrderBy(s => s).ToList();
+
+            _stateDescriptions = _allRows.Select(r => r.StateDescription)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct().OrderBy(s => s).ToList();
+
+            _salesUnits = _allRows.Select(r => r.SalesUnit)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct().OrderBy(s => s).ToList();
+
+            ApplyFilters();
+            _loaded = true;
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+    }
+
+    private void LoadCsv(string path)
+    {
+        using var sr = new StreamReader(path);
+
+        // header
+        var headerLine = sr.ReadLine();
+        if (string.IsNullOrWhiteSpace(headerLine))
+            throw new InvalidOperationException("CSV appears to be empty.");
+
+        // Expecting:
+        // period,stateid,stateDescription,ALL,COM,IND,OTH,RES,TRA,salesUnit
+        // We'll parse by position and ignore extra columns if present.
+        string? line;
+        while ((line = sr.ReadLine()) is not null)
+        {
+            if (string.IsNullOrWhiteSpace(line)) continue;
+
+            var cells = SplitCsvLine(line);
+            if (cells.Count < 10) continue;
+
+            _allRows.Add(new Row
+            {
+                Period = cells[0],
+                StateId = cells[1],
+                StateDescription = cells[2],
+                All = ParseNullableDecimal(cells[3]),
+                Com = ParseNullableDecimal(cells[4]),
+                Ind = ParseNullableDecimal(cells[5]),
+                Oth = ParseNullableDecimal(cells[6]),
+                Res = ParseNullableDecimal(cells[7]),
+                Tra = ParseNullableDecimal(cells[8]),
+                SalesUnit = cells[9],
+            });
+        }
+    }
+
+    // Triggered by @bind:after
+    private void OnFilterChanged()
+    {
+        CurrentPage = 1;
+        ApplyFilters();
+    }
+
+    // Triggered by @bind:after on PageSize
+    
+    private void PrevPage()
+    {
+        if (CurrentPage > 1)
+            CurrentPage--;
+
+        StateHasChanged();
+    }
+
+    private void NextPage()
+    {
+        if (CurrentPage < TotalPages)
+            CurrentPage++;
+
+        StateHasChanged();
+    }
+
+    private void OnPageSizeChanged()
+    {
+    CurrentPage = 1;
+    // TotalPages updates automatically because it depends on PageSize
+    StateHasChanged();
+}
+
+    private void ClearFilters()
+    {
+        Filters = new FilterState();
+        CurrentPage = 1;
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        IEnumerable<Row> q = _allRows;
+
+        // period range (assumes YYYY-MM so lexicographic compare works)
+        if (!string.IsNullOrWhiteSpace(Filters.PeriodFrom))
+            q = q.Where(r => string.Compare(r.Period, Filters.PeriodFrom, StringComparison.Ordinal) >= 0);
+
+        if (!string.IsNullOrWhiteSpace(Filters.PeriodTo))
+            q = q.Where(r => string.Compare(r.Period, Filters.PeriodTo, StringComparison.Ordinal) <= 0);
+
+        // categorical
+        if (!string.IsNullOrWhiteSpace(Filters.StateId))
+            q = q.Where(r => r.StateId == Filters.StateId);
+
+        if (!string.IsNullOrWhiteSpace(Filters.StateDescription))
+            q = q.Where(r => r.StateDescription == Filters.StateDescription);
+
+        if (!string.IsNullOrWhiteSpace(Filters.SalesUnit))
+            q = q.Where(r => r.SalesUnit == Filters.SalesUnit);
+
+        // numeric min/max
+        q = ApplyNumericRange(q, r => r.All, Filters.AllMin, Filters.AllMax);
+        q = ApplyNumericRange(q, r => r.Com, Filters.ComMin, Filters.ComMax);
+        q = ApplyNumericRange(q, r => r.Ind, Filters.IndMin, Filters.IndMax);
+        q = ApplyNumericRange(q, r => r.Oth, Filters.OthMin, Filters.OthMax);
+        q = ApplyNumericRange(q, r => r.Res, Filters.ResMin, Filters.ResMax);
+        q = ApplyNumericRange(q, r => r.Tra, Filters.TraMin, Filters.TraMax);
+
+        _filteredRows = q.ToList();
+
+        // Clamp page
+        if (CurrentPage > TotalPages) CurrentPage = TotalPages;
+        if (CurrentPage < 1) CurrentPage = 1;
+    }
+
+    private static IEnumerable<Row> ApplyNumericRange(
+        IEnumerable<Row> q,
+        Func<Row, decimal?> selector,
+        decimal? min,
+        decimal? max)
+    {
+        if (min is not null) q = q.Where(r => selector(r) is not null && selector(r) >= min);
+        if (max is not null) q = q.Where(r => selector(r) is not null && selector(r) <= max);
+        return q;
+    }
+
+    // Generates two inputs (min/max) for a numeric column without using @bind to avoid duplicate handlers
+    private RenderFragment NumericFilter(string shortLabel, string longLabel, string key) => builder =>
+    {
+        var seq = 0;
+
+        builder.OpenElement(seq++, "div");
+        builder.AddAttribute(seq++, "class", "col-12 col-md-6 col-lg-4 col-xl-3");
+
+        builder.OpenElement(seq++, "label");
+        builder.AddAttribute(seq++, "class", "form-label");
+        builder.AddContent(seq++, $"{shortLabel} ({longLabel})");
+        builder.CloseElement();
+
+        builder.OpenElement(seq++, "div");
+        builder.AddAttribute(seq++, "class", "input-group");
+
+        // Min label
+        builder.OpenElement(seq++, "span");
+        builder.AddAttribute(seq++, "class", "input-group-text");
+        builder.AddContent(seq++, "Min");
+        builder.CloseElement();
+
+        // Min input
+        builder.OpenElement(seq++, "input");
+        builder.AddAttribute(seq++, "class", "form-control");
+        builder.AddAttribute(seq++, "inputmode", "decimal");
+        builder.AddAttribute(seq++, "placeholder", "—");
+        builder.AddAttribute(seq++, "value", GetMinValue(key));
+        builder.AddAttribute(seq++, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
+        {
+            SetMinValue(key, e?.Value?.ToString());
+            CurrentPage = 1;
+            ApplyFilters();
+            StateHasChanged();
+        }));
+        builder.CloseElement();
+
+        // Max label
+        builder.OpenElement(seq++, "span");
+        builder.AddAttribute(seq++, "class", "input-group-text");
+        builder.AddContent(seq++, "Max");
+        builder.CloseElement();
+
+        // Max input
+        builder.OpenElement(seq++, "input");
+        builder.AddAttribute(seq++, "class", "form-control");
+        builder.AddAttribute(seq++, "inputmode", "decimal");
+        builder.AddAttribute(seq++, "placeholder", "—");
+        builder.AddAttribute(seq++, "value", GetMaxValue(key));
+        builder.AddAttribute(seq++, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
+        {
+            SetMaxValue(key, e?.Value?.ToString());
+            CurrentPage = 1;
+            ApplyFilters();
+            StateHasChanged();
+        }));
+        builder.CloseElement();
+
+        builder.CloseElement(); // input-group
+        builder.CloseElement(); // col
+    };
+
+    private string GetMinValue(string key) => key switch
+    {
+        nameof(Row.All) => Filters.AllMin?.ToString() ?? "",
+        nameof(Row.Com) => Filters.ComMin?.ToString() ?? "",
+        nameof(Row.Ind) => Filters.IndMin?.ToString() ?? "",
+        nameof(Row.Oth) => Filters.OthMin?.ToString() ?? "",
+        nameof(Row.Res) => Filters.ResMin?.ToString() ?? "",
+        nameof(Row.Tra) => Filters.TraMin?.ToString() ?? "",
+        _ => ""
+    };
+
+    private string GetMaxValue(string key) => key switch
+    {
+        nameof(Row.All) => Filters.AllMax?.ToString() ?? "",
+        nameof(Row.Com) => Filters.ComMax?.ToString() ?? "",
+        nameof(Row.Ind) => Filters.IndMax?.ToString() ?? "",
+        nameof(Row.Oth) => Filters.OthMax?.ToString() ?? "",
+        nameof(Row.Res) => Filters.ResMax?.ToString() ?? "",
+        nameof(Row.Tra) => Filters.TraMax?.ToString() ?? "",
+        _ => ""
+    };
+
+    private void SetMinValue(string key, string? val)
+    {
+        var parsed = ParseNullableDecimal(val);
+        switch (key)
+        {
+            case nameof(Row.All): Filters.AllMin = parsed; break;
+            case nameof(Row.Com): Filters.ComMin = parsed; break;
+            case nameof(Row.Ind): Filters.IndMin = parsed; break;
+            case nameof(Row.Oth): Filters.OthMin = parsed; break;
+            case nameof(Row.Res): Filters.ResMin = parsed; break;
+            case nameof(Row.Tra): Filters.TraMin = parsed; break;
+        }
+    }
+
+    private void SetMaxValue(string key, string? val)
+    {
+        var parsed = ParseNullableDecimal(val);
+        switch (key)
+        {
+            case nameof(Row.All): Filters.AllMax = parsed; break;
+            case nameof(Row.Com): Filters.ComMax = parsed; break;
+            case nameof(Row.Ind): Filters.IndMax = parsed; break;
+            case nameof(Row.Oth): Filters.OthMax = parsed; break;
+            case nameof(Row.Res): Filters.ResMax = parsed; break;
+            case nameof(Row.Tra): Filters.TraMax = parsed; break;
+        }
+    }
+
+    private static decimal? ParseNullableDecimal(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return null;
+        s = s.Trim().Replace(",", "");
+        return decimal.TryParse(s, out var v) ? v : null;
+    }
+
+    private static string Fmt(decimal? v) => v is null ? "" : v.Value.ToString("0.####");
+
+    // Basic CSV parsing (commas + quotes + escaped quotes "")
+    private static List<string> SplitCsvLine(string line)
+    {
+        var result = new List<string>();
+        var sb = new System.Text.StringBuilder();
+        bool inQuotes = false;
+
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+
+            if (c == '"')
+            {
+                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                {
+                    sb.Append('"');
+                    i++;
+                }
+                else
+                {
+                    inQuotes = !inQuotes;
+                }
+            }
+            else if (c == ',' && !inQuotes)
+            {
+                result.Add(sb.ToString().Trim());
+                sb.Clear();
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        result.Add(sb.ToString().Trim());
+        return result;
+    }
+
+    private sealed class Row
+    {
+        public string Period { get; set; } = "";
+        public string StateId { get; set; } = "";
+        public string StateDescription { get; set; } = "";
+
+        public decimal? All { get; set; }
+        public decimal? Com { get; set; }
+        public decimal? Ind { get; set; }
+        public decimal? Oth { get; set; }
+        public decimal? Res { get; set; }
+        public decimal? Tra { get; set; }
+
+        public string SalesUnit { get; set; } = "";
+    }
+
+    private sealed class FilterState
+    {
+        public string? PeriodFrom { get; set; }
+        public string? PeriodTo { get; set; }
+
+        public string? StateId { get; set; }
+        public string? StateDescription { get; set; }
+        public string? SalesUnit { get; set; }
+
+        public decimal? AllMin { get; set; }
+        public decimal? AllMax { get; set; }
+
+        public decimal? ComMin { get; set; }
+        public decimal? ComMax { get; set; }
+
+        public decimal? IndMin { get; set; }
+        public decimal? IndMax { get; set; }
+
+        public decimal? OthMin { get; set; }
+        public decimal? OthMax { get; set; }
+
+        public decimal? ResMin { get; set; }
+        public decimal? ResMax { get; set; }
+
+        public decimal? TraMin { get; set; }
+        public decimal? TraMax { get; set; }
+    }
+}

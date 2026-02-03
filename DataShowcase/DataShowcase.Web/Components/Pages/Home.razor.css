@@ -1,0 +1,71 @@
+.hero {
+    background:
+        radial-gradient(1200px circle at 10% 10%, rgba(255, 255, 255, 0.18), transparent 45%),
+        radial-gradient(900px circle at 90% 30%, rgba(255, 255, 255, 0.10), transparent 55%),
+        linear-gradient(135deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    border: 1px solid rgba(255,255,255,0.18);
+}
+
+.eyebrow {
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.10);
+    color: white;
+    backdrop-filter: blur(8px);
+}
+
+.stat-label {
+    opacity: 0.85;
+}
+
+.stat-value {
+    font-weight: 600;
+}
+
+.mono {
+    font-variant-numeric: tabular-nums;
+}
+
+.feature-card {
+    text-decoration: none;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0,0,0,0.10);
+}
+
+.icon-badge {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13, 110, 253, 0.10);
+    color: rgba(13, 110, 253, 1);
+}
+
+.disabled-card {
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
+.checklist li {
+    padding-left: 1.6rem;
+    position: relative;
+}
+
+.checklist li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0.7;
+}
