@@ -20,7 +20,6 @@ Colab Pro.edu Tier:
   L4 - 3 -> 4.82 CU/hour
   TPU v2-8 -> 1.76 CU/hour
 
-  
 https://archive.ics.uci.edu/datasets
 https://fred.stlouisfed.org/
 https://datahub.io/collections
@@ -31,15 +30,3 @@ https://datasetsearch.research.google.com/
 https://nasa-power.s3.us-west-2.amazonaws.com/index.html
 https://power.larc.nasa.gov/dashboard/
 
-
-**top 10 sku by count**
-{0: '3/4_SCH_40_90_DEG_ELBOW_SXS_35_PK',
- 1: '3/4_SIDE_OUTLET_90_DEGREE_SOCKET',
- 2: '3/4_SCH_40_TEE_SXSXS_(20_PACK)',
- 3: '3/4_PVC_COUPLING_DEEP_SOCKET_SXS',
- 4: '11/4X2FT_PVC_SCH_40_PIPE',
- 5: '3/4_SCH_40_COUPLING_SXS_(25_PACK)',
- 6: '1_PVC_SIDE_OUTLET90_DEG_ELBOW_SXSXS',
- 7: '3/4_PVC_RUNNING_TRAP_SPGXSPG',
- 8: '1/2X2_FLOWGUARD_GOLD_CPVC',
- 9: '11/2X2_PVC_MALE_ADAPTER_MPTXS'}
