@@ -1,34 +1,13 @@
 # advanced_business_analytics
 Group 1 Project in DSBA Advanced Business Analytics 6211
-
-#General Google Colab information
-As Students we have access to 2 tiers, the free tier and the Pro .edu tier
-Python Runtime versions are only 2025.10 and 2025.07
-
-Free Tier:
-  Free tier offers us a the T4 GPU and v5e-1 TPU hardware acceleration options. 
-  Colab could limit/deny accelerators depending on demand or recent usage due to limit fluctuations which could terminate
-  runtimes. Notebooks will timeout at the 12 hour mark or if idle.
-  T4 GPU works well with Pytorch CUDA workflows: (Tesla T4 Express 16GB HBM2 256 GB/s) 
-  v5e-1 TPU works well with tensorflow: (197 TFLOPs, 16GB with 819 GB/s) 
-  
-Colab Pro.edu Tier:
-  100 Compute units per month. Compute units expire after 90 days. (which means up to 300 Compute Units in 3 Months)
-  Access to more GPU and RAM 
-  H100 - 18.05 CU/hour
-  A100 - 5.37 -> 11.77 CU/hour
-  L4 - 3 -> 4.82 CU/hour
-  TPU v2-8 -> 1.76 CU/hour
-
-  
-https://archive.ics.uci.edu/datasets
 https://fred.stlouisfed.org/
-https://datahub.io/collections
-https://www.earthdata.nasa.gov/data
-https://github.com/awesomedata/awesome-public-datasets
-https://datasetsearch.research.google.com/
 
-https://nasa-power.s3.us-west-2.amazonaws.com/index.html
-https://power.larc.nasa.gov/dashboard/
+## Correlation Analysis ###
+SKU sales show a stronger relationship with housing completions (COMPUTSA) than with housing starts (HOUST). The most useful signals are generally smoothed trends (roll3) and year-over-year changes (pct_12m), rather than raw monthly levels or one-month changes. The most common winning timing pattern is a 3- to 6-month lag, especially 6 months, which suggests sales tend to respond to housing activity with a delay.
 
+At the SKU level, many of the best-fit correlations are moderately strong, but they should be treated as exploratory rather than final, because each SKU was optimized across many feature combinations. The clearest portfolio-level takeaway is that COMPUTSA, especially in smoothed or YoY form, is the better macro driver to use as a benchmark signal. If you want one standardized macro relationship to carry forward, COMPUTSA_roll3_lag6 is the strongest candidate from this analysis.
 
+Use best_beta as the SKU-level scaling coefficient and best_corr as the confidence check.
+For each SKU, best_beta tells you the estimated change in sales_units associated with a 1-unit increase in the selected housing driver (COMPUTSA or HOUST). For example, if a SKU has best_beta = 0.18, then a 1-unit increase in the chosen housing series is associated with an estimated increase of 0.18 sales units for that SKU. best_corr should not be used as the scaling factor; instead, it tells you how strong and reliable that relationship appears to be. Higher absolute values mean a stronger relationship.
+
+In practice, use best_beta for planning or sensitivity calculations, and use best_corr plus observation count as a filter before trusting the result. A simple rule is to rely more on coefficients where abs(best_corr) is at least moderate and the SKU has enough history. So the workflow is: identify the SKU, check its best_driver, use best_beta as the coefficient, and confirm that best_corr is strong enough to make the relationship worth using.
