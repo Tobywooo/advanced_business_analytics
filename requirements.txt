@@ -6,3 +6,4 @@ seaborn
 statsmodels
 dmba
 ipykernel
+fredapi
