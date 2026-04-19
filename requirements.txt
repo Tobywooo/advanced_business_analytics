@@ -7,3 +7,4 @@ statsmodels
 dmba
 ipykernel
 fredapi
+prophet
