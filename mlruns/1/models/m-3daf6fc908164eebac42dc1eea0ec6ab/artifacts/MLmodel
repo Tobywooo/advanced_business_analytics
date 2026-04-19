@@ -1,0 +1,21 @@
+artifact_path: file:///c:/Users/jaypm/OneDrive/Documents/GitHub/advanced_business_analytics/mlruns/1/models/m-3daf6fc908164eebac42dc1eea0ec6ab/artifacts
+flavors:
+  prophet:
+    code: null
+    data: model.pr
+    model_type: Prophet
+    prophet_version: 1.3.0
+  python_function:
+    data: model.pr
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.prophet
+    python_version: 3.11.1
+mlflow_version: 3.11.1
+model_id: m-3daf6fc908164eebac42dc1eea0ec6ab
+model_size_bytes: 12505
+model_uuid: m-3daf6fc908164eebac42dc1eea0ec6ab
+prompts: null
+run_id: 4265ea49242242a5846b41767992a813
+utc_time_created: '2026-04-19 17:49:38.225875'
